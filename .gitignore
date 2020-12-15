@@ -1,0 +1,7 @@
+.terraform
+terraform.tfstate*
+*.tfvars
+*.tfstate.lock.info
+*.pem
+*.pub
+*.DS_Store
