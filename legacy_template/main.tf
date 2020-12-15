@@ -1,6 +1,5 @@
 
 locals {
-  module_source_base = "git@github.ecs-digital.co.uk/ECSD/playground-frame.git?ref=master/"
   stack_name         = "dpg-jenkins"
   count              = "100"
   ssh_key_name       = "DPG-Jenkins"
