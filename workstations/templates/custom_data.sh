@@ -18,15 +18,17 @@ echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sour
 apt-get update
 apt-get install helm
 
-# # Remove line breaks from ca_cert
-# echo ${ca_cert} > input.txt
-# tr -d '\n' < input.txt > output.txt
-# ca_cert_truncated=$(cat output.txt)
+# Install git
+apt-get install git -y
+
+# Install Azure CLI and login
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+az login --service-principal -u ${az_user} -p ${az_password} --tenant ${az_tenant}
 
 # Create .kube/config file
-mkdir /home/${user}/.kube
-touch /home/${user}/.kube/config
-cat <<EOF > /home/${user}/.kube/config
+mkdir /home/${linux_user}/.kube
+touch /home/${linux_user}/.kube/config
+cat <<EOF > /home/${linux_user}/.kube/config
 apiVersion: v1
 kind: Config
 preferences: {}

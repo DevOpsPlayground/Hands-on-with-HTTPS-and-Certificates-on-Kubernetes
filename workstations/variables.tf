@@ -1,5 +1,5 @@
 variable "num_attendees" {
-  default = 2
+  default     = 1
   description = "Number of people attending DevOps Playground"
 }
 
@@ -22,4 +22,15 @@ variable "workstation_username" {
 
 variable "workstation_password" {
   default = "Password1234!"
+  sensitive = true
+}
+
+variable "vm_size" {
+  description = "The size of the VMs for workstations"
+  default     = "Standard_DS1_v2"
+}
+
+variable "app_password" {
+  default = "password"
+  sensitive = true
 }

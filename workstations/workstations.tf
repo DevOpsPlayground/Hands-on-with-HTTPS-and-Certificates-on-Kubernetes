@@ -4,8 +4,8 @@ resource "random_pet" "pet" {
 }
 
 resource "kubernetes_namespace" "ns" {
-  depends_on = [random_pet.pet]  
-  for_each = toset( random_pet.pet.*.id )
+  depends_on = [random_pet.pet]
+  for_each   = toset(random_pet.pet.*.id)
 
   metadata {
     name = each.key
@@ -13,51 +13,67 @@ resource "kubernetes_namespace" "ns" {
 }
 
 resource "kubernetes_service_account" "sa" {
-  depends_on = [random_pet.pet]  
-  for_each = toset( random_pet.pet.*.id )
+  depends_on = [random_pet.pet]
+  for_each   = toset(random_pet.pet.*.id)
 
   metadata {
-    name = "${each.key}-user"
+    name      = "${each.key}-user"
     namespace = kubernetes_namespace.ns[each.key].metadata[0].name
   }
 }
 
 data "kubernetes_secret" "secret" {
-#   for_each = toset( [for s in kubernetes_service_account.sa : s.default_secret_name ])
-  depends_on = [random_pet.pet]  
-  for_each = toset( random_pet.pet.*.id )
+  #   for_each = toset( [for s in kubernetes_service_account.sa : s.default_secret_name ])
+  depends_on = [random_pet.pet]
+  for_each   = toset(random_pet.pet.*.id)
 
   metadata {
-    name = kubernetes_service_account.sa[each.key].default_secret_name
+    name      = kubernetes_service_account.sa[each.key].default_secret_name
     namespace = kubernetes_namespace.ns[each.key].metadata[0].name
   }
 }
 
 resource "kubernetes_role" "role" {
-  depends_on = [random_pet.pet]  
-  for_each = toset( random_pet.pet.*.id )
-  
+  depends_on = [random_pet.pet]
+  for_each   = toset(random_pet.pet.*.id)
+
   metadata {
-    name = "${each.key}-role"
+    name      = "${each.key}-role"
     namespace = kubernetes_namespace.ns[each.key].metadata[0].name
   }
 
   rule {
-    api_groups     = ["", "extensions", "apps"]
-    resources      = ["*"]
-    verbs          = ["*"]
+    api_groups = ["", "extensions", "apps"]
+    resources  = ["*"]
+    verbs      = ["*"]
   }
   rule {
     api_groups = ["batch"]
     resources  = ["jobs", "cronjobs"]
     verbs      = ["*"]
   }
+  rule {
+    api_groups = ["rbac.authorization.k8s.io"]
+    resources  = ["roles", "rolebindings"]
+    verbs      = ["*"]
+  }
+  rule {
+    api_groups = ["cert-manager.io"]
+    resources  = ["issuers", "certificates"]
+    verbs      = ["*"]
+  }
+  rule {
+    api_groups = ["networking.k8s.io"]
+    resources  = ["ingresses"]
+    verbs      = ["*"]
+  }
+
 }
 
 
 resource "kubernetes_role_binding" "rb" {
-  depends_on = [random_pet.pet]  
-  for_each = toset( random_pet.pet.*.id )
+  depends_on = [random_pet.pet]
+  for_each   = toset(random_pet.pet.*.id)
 
   metadata {
     name      = "${each.key}-rb"
@@ -97,20 +113,20 @@ resource "azurerm_subnet" "internal" {
 }
 
 resource "azurerm_public_ip" "public" {
-  depends_on = [random_pet.pet] 
-  for_each = toset( random_pet.pet.*.id )
+  depends_on = [random_pet.pet]
+  for_each   = toset(random_pet.pet.*.id)
 
-  name                  = "dpg-${each.key}-public-ip"
+  name                = "dpg-${each.key}-public-ip"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   allocation_method   = "Dynamic"
 }
 
 resource "azurerm_network_interface" "main" {
-  depends_on = [random_pet.pet, azurerm_public_ip.public] 
-  for_each = toset( random_pet.pet.*.id )
+  depends_on = [random_pet.pet, azurerm_public_ip.public]
+  for_each   = toset(random_pet.pet.*.id)
 
-  name                  = "dpg-${each.key}-ni"
+  name                = "dpg-${each.key}-ni"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -123,14 +139,14 @@ resource "azurerm_network_interface" "main" {
 }
 
 resource "azurerm_virtual_machine" "main" {
-  depends_on = [random_pet.pet] 
-  for_each = toset( random_pet.pet.*.id )
+  depends_on = [random_pet.pet]
+  for_each   = toset(random_pet.pet.*.id)
 
   name                  = "dpg-${each.key}-vm"
   location              = azurerm_resource_group.main.location
   resource_group_name   = azurerm_resource_group.main.name
   network_interface_ids = [azurerm_network_interface.main[each.key].id]
-  vm_size               = "Standard_DS1_v2"
+  vm_size               = var.vm_size
 
   # Uncomment this line to delete the OS disk automatically when deleting the VM
   delete_os_disk_on_termination = true
@@ -151,12 +167,21 @@ resource "azurerm_virtual_machine" "main" {
     managed_disk_type = "Standard_LRS"
   }
   os_profile {
-    computer_name  = "hostname"
+    computer_name  = each.key
     admin_username = var.workstation_username
     admin_password = var.workstation_password
     # custom_data = templatefile("${path.module}/templates/custom_data.sh", { user = var.workstation_username, host = data.terraform_remote_state.aks-cluster.outputs.host, namespace = kubernetes_namespace.ns[each.key].metadata[0].name, sa = kubernetes_service_account.sa[each.key].metadata[0].name, ca_cert = replace(replace(data.kubernetes_secret.secret[each.key].data["ca.crt"], "\n", ""), "/-----(\\w+\\s\\w+)-----/", ""), token = data.kubernetes_secret.secret[each.key].data["token"] })
-    custom_data = templatefile("${path.module}/templates/custom_data.sh", { user = var.workstation_username, host = data.terraform_remote_state.aks-cluster.outputs.host, namespace = kubernetes_namespace.ns[each.key].metadata[0].name, sa = kubernetes_service_account.sa[each.key].metadata[0].name, ca_cert = data.terraform_remote_state.aks-cluster.outputs.cluster_ca_certificate, token = data.kubernetes_secret.secret[each.key].data["token"] })
-  }
+    custom_data = templatefile("${path.module}/templates/custom_data.sh",
+      { az_user    = azuread_service_principal.sp.application_id,
+        az_password = var.app_password,
+        az_tenant  = data.azurerm_client_config.current.tenant_id,
+        linux_user = var.workstation_username,
+        host       = data.terraform_remote_state.aks-cluster.outputs.host,
+        namespace  = kubernetes_namespace.ns[each.key].metadata[0].name,
+        sa         = kubernetes_service_account.sa[each.key].metadata[0].name,
+        ca_cert    = data.terraform_remote_state.aks-cluster.outputs.cluster_ca_certificate,
+        token      = data.kubernetes_secret.secret[each.key].data["token"] })
+      }
   os_profile_linux_config {
     disable_password_authentication = false
   }

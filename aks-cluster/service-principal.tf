@@ -1,6 +1,6 @@
 
 resource "azuread_application" "app" {
-  name                       = "vault"
+  name                       = "aks"
   homepage                   = "https://homepage"
   identifier_uris            = ["https://uri"]
   reply_urls                 = ["https://replyurl"]

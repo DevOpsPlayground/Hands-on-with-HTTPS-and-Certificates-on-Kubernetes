@@ -6,10 +6,10 @@ output "azure_vm_public_ips" {
   value = [for pub_ip in azurerm_public_ip.public : pub_ip.ip_address]
 }
 
-output "kubernetes_sa_secret_name" {
-  # value = kubernetes_service_account.sa.secret[0].name
-  value = [for sa in kubernetes_service_account.sa : sa.default_secret_name ]
-}
+# output "kubernetes_sa_secret_name" {
+#   # value = kubernetes_service_account.sa.secret[0].name
+#   value = [for sa in kubernetes_service_account.sa : sa.default_secret_name]
+# }
 
 # output "kubernetes_secret_ca_crt" {
 #   # value = kubernetes_service_account.sa.secret[0].name
@@ -21,7 +21,17 @@ output "kubernetes_sa_secret_name" {
 #   value = [for secret in data.kubernetes_secret.secret : secret.data["token"] ]
 # }
 
-output "kubernetes_secret_ca_crt" {
+# output "kubernetes_secret_ca_crt" {
+#   # value = kubernetes_service_account.sa.secret[0].name
+#   value = [for secret in data.kubernetes_secret.secret : secret.data]
+# }
+
+output "azure_service_principal_app_id" {
   # value = kubernetes_service_account.sa.secret[0].name
-  value = [for secret in data.kubernetes_secret.secret : secret.data ]
+  value = azuread_service_principal.sp.application_id
+}
+
+output "azure_service_principal_obj_id" {
+  # value = kubernetes_service_account.sa.secret[0].name
+  value = azuread_service_principal.sp.object_id
 }
