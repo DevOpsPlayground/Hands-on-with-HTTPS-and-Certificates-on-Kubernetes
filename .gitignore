@@ -7,6 +7,12 @@
 **/*.tfstate
 **/*.tfstate.*
 
+# Any other .terraform files
+.terraform.*
+*.terraform
+*.terraform.*
+.terraform.lock.hcl
+
 # Crash log files
 crash.log
 
