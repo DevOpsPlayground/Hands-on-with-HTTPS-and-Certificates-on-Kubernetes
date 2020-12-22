@@ -1,0 +1,22 @@
+apiVersion: cert-manager.io/v1alpha2
+# An Issuer is a custom resource definition (CRD) made available through the cert-manager controller
+# Issuers represent CAs and allow us to automate the generation of signed certificates
+kind: Issuer
+metadata:
+  name: letsencrypt
+spec:
+# Automated Certificate Management Environment (ACME) Certificate Authority server
+# Certificates issued by public ACME servers are typically trusted by client’s browsers by default
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: user@example.com
+    privateKeySecretRef:
+      name: letsencrypt
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+          podTemplate:
+            spec:
+              nodeSelector:
+                "kubernetes.io/os": linux
