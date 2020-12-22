@@ -7,7 +7,6 @@
 
   az login
 
-
 ## Create AKS cluster using Terraform
 
   terraform init

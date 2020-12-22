@@ -1,3 +1,6 @@
+##############################################################################
+# Create service principal with access to only the public-ip resouce in Azure
+##############################################################################
 resource "azuread_application" "app" {
   name                       = "dpg"
   homepage                   = "https://dpg"

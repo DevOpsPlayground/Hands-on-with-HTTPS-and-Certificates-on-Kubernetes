@@ -5,15 +5,15 @@
     - [x] HELM 
     - [x] Azure CLI
     - [x] kubectl
-    - [x] kubeconf file for the namespace
+    - [x] .kube/config file for the namespace
     - [x] SSH
     - [ ] IDE
-    - [ ] git (and clone down repo) - Need the repo to be public
-- [ ] Service principal (permissions for the workstations - possibly one for all)
+    - [x] git
+- [x] Service principal (permissions for the workstations - possibly one for all)
    - [x] Service principal created
-   - [ ] Place credentials on attendee workstation for easy login
+   - [x] Place credentials on attendee workstation for easy login
 - [x] K8s namespace configuration
-- [ ] Correct K8s Roles/RoleBindings for each attendee (in progress )
+- [x] Correct K8s Roles/RoleBindings for each attendee
 - [x] Synopsis of topic
-- [ ] Add steps for playground to README (Need to clean up and make more polished)
-- [ ] Need to figure out how to add attach class to ingress resource (may need to revert to earlier version of kubernetes)
+- [x] Add steps for playground to README (Need to clean up and make more polished)
+- [x] Need to figure out how to add attach class to ingress resource 

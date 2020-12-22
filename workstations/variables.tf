@@ -21,7 +21,7 @@ variable "workstation_username" {
 }
 
 variable "workstation_password" {
-  default = "Password1234!"
+  default   = "Password1234!"
   sensitive = true
 }
 
@@ -31,6 +31,6 @@ variable "vm_size" {
 }
 
 variable "app_password" {
-  default = "password"
+  default   = "password"
   sensitive = true
 }

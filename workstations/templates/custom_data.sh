@@ -21,9 +21,11 @@ apt-get install helm
 # Install git
 apt-get install git -y
 
-# Install Azure CLI and login
-curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-az login --service-principal -u ${az_user} -p ${az_password} --tenant ${az_tenant}
+# Install Azure CLI and add service principal creds to .bashrc as environment variables
+curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+echo "export APP_ID=${az_user}" >> /home/${linux_user}/.bashrc
+echo "export APP_PW=${az_password}" >> /home/${linux_user}/.bashrc
+echo "export TENANT_ID=${az_tenant}" >> /home/${linux_user}/.bashrc
 
 # Create .kube/config file
 mkdir /home/${linux_user}/.kube
@@ -37,7 +39,6 @@ preferences: {}
 clusters:
 - cluster:
     certificate-authority-data: ${ca_cert}
-    # You'll need the API endpoint of your Cluster here:
     server: ${host}
   name: verified-drake-aks
 

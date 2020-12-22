@@ -1,10 +1,11 @@
+###############################################################################
 # Configure isolated namespaces within the Kubernetes cluster for each attendee
+###############################################################################
 resource "random_pet" "pet" {
   count = var.num_attendees
 }
 
 resource "kubernetes_namespace" "ns" {
-  depends_on = [random_pet.pet]
   for_each   = toset(random_pet.pet.*.id)
 
   metadata {
@@ -13,7 +14,6 @@ resource "kubernetes_namespace" "ns" {
 }
 
 resource "kubernetes_service_account" "sa" {
-  depends_on = [random_pet.pet]
   for_each   = toset(random_pet.pet.*.id)
 
   metadata {
@@ -23,8 +23,6 @@ resource "kubernetes_service_account" "sa" {
 }
 
 data "kubernetes_secret" "secret" {
-  #   for_each = toset( [for s in kubernetes_service_account.sa : s.default_secret_name ])
-  depends_on = [random_pet.pet]
   for_each   = toset(random_pet.pet.*.id)
 
   metadata {
@@ -34,7 +32,6 @@ data "kubernetes_secret" "secret" {
 }
 
 resource "kubernetes_role" "role" {
-  depends_on = [random_pet.pet]
   for_each   = toset(random_pet.pet.*.id)
 
   metadata {
@@ -67,12 +64,9 @@ resource "kubernetes_role" "role" {
     resources  = ["ingresses"]
     verbs      = ["*"]
   }
-
 }
 
-
 resource "kubernetes_role_binding" "rb" {
-  depends_on = [random_pet.pet]
   for_each   = toset(random_pet.pet.*.id)
 
   metadata {
@@ -92,7 +86,9 @@ resource "kubernetes_role_binding" "rb" {
   }
 }
 
-# Create Azure virtual machines to act as workstations for attendees
+####################################################################
+# Create Azure virtual machines to act as workstations for attendees 
+####################################################################
 resource "azurerm_resource_group" "main" {
   name     = "${var.prefix}-resources"
   location = var.location
@@ -113,7 +109,6 @@ resource "azurerm_subnet" "internal" {
 }
 
 resource "azurerm_public_ip" "public" {
-  depends_on = [random_pet.pet]
   for_each   = toset(random_pet.pet.*.id)
 
   name                = "dpg-${each.key}-public-ip"
@@ -139,7 +134,6 @@ resource "azurerm_network_interface" "main" {
 }
 
 resource "azurerm_virtual_machine" "main" {
-  depends_on = [random_pet.pet]
   for_each   = toset(random_pet.pet.*.id)
 
   name                  = "dpg-${each.key}-vm"
@@ -148,10 +142,8 @@ resource "azurerm_virtual_machine" "main" {
   network_interface_ids = [azurerm_network_interface.main[each.key].id]
   vm_size               = var.vm_size
 
-  # Uncomment this line to delete the OS disk automatically when deleting the VM
   delete_os_disk_on_termination = true
 
-  # Uncomment this line to delete the data disks automatically when deleting the VM
   delete_data_disks_on_termination = true
 
   storage_image_reference {
@@ -170,18 +162,20 @@ resource "azurerm_virtual_machine" "main" {
     computer_name  = each.key
     admin_username = var.workstation_username
     admin_password = var.workstation_password
-    # custom_data = templatefile("${path.module}/templates/custom_data.sh", { user = var.workstation_username, host = data.terraform_remote_state.aks-cluster.outputs.host, namespace = kubernetes_namespace.ns[each.key].metadata[0].name, sa = kubernetes_service_account.sa[each.key].metadata[0].name, ca_cert = replace(replace(data.kubernetes_secret.secret[each.key].data["ca.crt"], "\n", ""), "/-----(\\w+\\s\\w+)-----/", ""), token = data.kubernetes_secret.secret[each.key].data["token"] })
     custom_data = templatefile("${path.module}/templates/custom_data.sh",
-      { az_user    = azuread_service_principal.sp.application_id,
+      { 
+        az_user     = azuread_service_principal.sp.application_id,
         az_password = var.app_password,
-        az_tenant  = data.azurerm_client_config.current.tenant_id,
-        linux_user = var.workstation_username,
-        host       = data.terraform_remote_state.aks-cluster.outputs.host,
-        namespace  = kubernetes_namespace.ns[each.key].metadata[0].name,
-        sa         = kubernetes_service_account.sa[each.key].metadata[0].name,
-        ca_cert    = data.terraform_remote_state.aks-cluster.outputs.cluster_ca_certificate,
-        token      = data.kubernetes_secret.secret[each.key].data["token"] })
+        az_tenant   = data.azurerm_client_config.current.tenant_id,
+        linux_user  = var.workstation_username,
+        host        = data.terraform_remote_state.aks-cluster.outputs.host,
+        namespace   = kubernetes_namespace.ns[each.key].metadata[0].name,
+        sa          = kubernetes_service_account.sa[each.key].metadata[0].name,
+        ca_cert     = data.terraform_remote_state.aks-cluster.outputs.cluster_ca_certificate,
+        token = data.kubernetes_secret.secret[each.key].data["token"] 
       }
+    )
+  }
   os_profile_linux_config {
     disable_password_authentication = false
   }
