@@ -77,7 +77,7 @@ During the installation, an Azure public IP address is created for the ingress c
     # Set FQDN as variable
     FQDN=$(az network public-ip show --ids $PUBLICIPID --query "[dnsSettings.fqdn]" --output tsv)
 
-### Deploy demo application to Kubernetes cluster
+### Deploy demo application to Kubernetes cluster
 Deploy the demo application using `kubectl apply`
 
     kubectl apply -f aks-helloworld.yaml
