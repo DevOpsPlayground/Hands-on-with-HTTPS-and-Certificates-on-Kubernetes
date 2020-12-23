@@ -1,5 +1,5 @@
 ## To do:
-- [ ] Set up playground Azure account - Patryk (In progress)
+- [x] Set up playground Azure account - Has now beeen updated to owner access
 - [x] Azure AKS cluster code - Robert
 - [ ] VM workstations with prepackaged latest versions of...
     - [x] HELM 
