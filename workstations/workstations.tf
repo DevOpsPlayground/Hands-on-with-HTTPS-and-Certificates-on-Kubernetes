@@ -162,7 +162,7 @@ resource "azurerm_virtual_machine" "main" {
     computer_name  = each.key
     admin_username = var.workstation_username
     admin_password = var.workstation_password
-    custom_data = templatefile("${path.module}/templates/custom_data.sh",
+    custom_data = templatefile("${path.module}/templates/custom_data.sh.tpl",
       { 
         az_user     = azuread_service_principal.sp.application_id,
         az_password = var.app_password,

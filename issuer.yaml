@@ -9,7 +9,8 @@ spec:
 # Certificates issued by public ACME servers are typically trusted by client’s browsers by default
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: user@example.com
+    # Temporary email generated via Temp Mail
+    email: nafifi3179@j24blog.com
     privateKeySecretRef:
       name: letsencrypt
     solvers:
