@@ -7,7 +7,7 @@ For years I pretended that I understood, as it seemed to either be expected as p
 
 Nowadays, simply knowing how certificates work is not enough. We need to know how to do something useful with this knowledge. Such as deploying HTTPS applications onto the modern platform of choice, Kubernetes.
 
-This hands on session aims to explain what certificate are, how they are used for secure commication and also how we can leverage Kubernetes to deploy HTTPS applications with relative ease. 
+This hands on session aims to explain what certificate are, how they are used for secure communication and also how we can leverage Kubernetes to deploy HTTPS applications with relative ease. 
 
 ## Tutorial
 This tutorial covers the steps required to deploy a HTTPS application on a pre-existing Kubernetes cluster built on on Azure Kubernetes Service (AKS).
