@@ -1,10 +1,11 @@
 # Hands-on-with-Kubernetes-on-Azure-managing-certificates-with-Helm
 
 ## Introduction 
-Ever wonder how certificates and HTTPS actually work ?
-I know I did for a long time. For years I pretended that I understood, as it seemed to either be expected as prior knowledge or simply glossed over in many tutorials.
+Ever wonder how certificates and HTTPS actually work ? I know I did for a long time...
 
-And nowadays, simply knowing how certificates work is not enough. We need to know how to do something useful with this knowledge. Such as deploying HTTPS applications on the modern platform of choice, Kubernetes.
+For years I pretended that I understood, as it seemed to either be expected as prior knowledge or simply glossed over in many tutorials.
+
+Nowadays, simply knowing how certificates work is not enough. We need to know how to do something useful with this knowledge. Such as deploying HTTPS applications onto the modern platform of choice, Kubernetes.
 
 This hands on session aims to explain what certificate are, how they are used for secure commication and also how we can leverage Kubernetes to deploy HTTPS applications with relative ease. 
 
