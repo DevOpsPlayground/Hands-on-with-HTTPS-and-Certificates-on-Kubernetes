@@ -31,6 +31,6 @@ variable "vm_size" {
 }
 
 variable "app_password" {
-  default   = "password"
-  sensitive = true
+  description = "Service Principal password"
+  sensitive   = true
 }

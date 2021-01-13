@@ -1,5 +1,5 @@
 variable "app_password" {
-  description = "Azure Kubernetes Service Cluster service principal password"
+  description = "Azure Kubernetes Service Cluster - Service Principal password"
   sensitive   = true
 }
 
