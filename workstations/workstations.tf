@@ -172,7 +172,9 @@ resource "azurerm_virtual_machine" "main" {
         namespace   = kubernetes_namespace.ns[each.key].metadata[0].name,
         sa          = kubernetes_service_account.sa[each.key].metadata[0].name,
         ca_cert     = data.terraform_remote_state.aks-cluster.outputs.cluster_ca_certificate,
-        token = data.kubernetes_secret.secret[each.key].data["token"] 
+        token       = data.kubernetes_secret.secret[each.key].data["token"] 
+        wetty_user  = var.workstation_username
+        wetty_pw    = var.workstation_password
       }
     )
   }
