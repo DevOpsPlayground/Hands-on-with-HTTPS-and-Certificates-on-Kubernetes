@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: self-signed-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - dpg.com
+    secretName: self-signed-secret
+  rules:
+  - host: dpg.com
+    http:
+      paths:
+      - backend:
+          serviceName: self-signed-app
+          servicePort: 80
+        path: /(.*)

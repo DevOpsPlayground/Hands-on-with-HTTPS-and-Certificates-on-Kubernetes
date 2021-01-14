@@ -1,6 +1,4 @@
-# Hands-on-with-Kubernetes-on-Azure-managing-certificates-with-Helm
-
-## Introduction 
+# Introduction 
 Ever wonder how certificates and HTTPS actually work ? I know I did for a long time...
 
 For years I pretended that I understood, as it seemed to either be expected as prior knowledge or simply glossed over in many tutorials.
@@ -9,7 +7,7 @@ Nowadays, simply knowing how certificates work is not enough. We need to know ho
 
 This hands on session aims to explain what certificates are, how they are used for secure communication and also how we can leverage Kubernetes to deploy HTTPS applications with relative ease. 
 
-## Tutorial
+# Hands-on Certificates on Kubernetes
 This tutorial covers the steps required to deploy a HTTPS application on a pre-existing Kubernetes cluster built on on Azure Kubernetes Service (AKS).
 
 In order to deploy our HTTPS application we will utilise the **Ingress** resource, available by default in Kubernetes. 
@@ -27,6 +25,51 @@ Clone down this repoistory
 
     git clone <this_repo>
     cd <repo_name>
+
+## Self-Signed Certificates 
+
+Add the ingress-nginx repository
+    
+    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+
+Use Helm to deploy an NGINX ingress controller
+    
+    helm install nginx-ingress ingress-nginx/ingress-nginx \
+        --set controller.replicaCount=2 \
+        --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
+        --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+
+Generate TLS certificates using openssl self-signed (or alternatively use Vault as CA, see `vault-ca` dir).
+
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -out /tmp/tls.crt \
+        -keyout /tmp/tls.key \
+        -subj "/CN=dpg.com"
+
+Create Kubernetes secret for the TLS certificate
+
+    kubectl create secret tls tls-secret \
+        --key /tmp/tls.key \
+        --cert /tmp/tls.crt
+
+Run the two demo applications using `kubectl apply`
+
+    kubectl apply -f self-signed/self-signed-app.yaml
+
+Create the ingress resource (remember to modify the host to be the CN, Common Name, you have configured)
+
+    kubectl apply -f self-signed/self-signed-app.yaml
+
+Test the ingress configuration (self-signed)
+
+    curl -v -k --resolve example.com:443:$(kubectl get services nginx-ingress-ingress-nginx-controller | awk 'NR==2 {print $4}') https://example.com # Trusts any certificates
+
+    curl -v --cacert tls.crt --resolve example.com:443:$(kubectl get services nginx-ingress-ingress-nginx-controller | awk 'NR==2 {print $4}') https://example.com # Trusts on certificate specified in command
+
+Alternatively on your own machie (not workstation) modify hosts file and view in browser.
+
+
+## Automated Certificates signed by LetsEncypt
 
 Login to Azure using service principal 
 
