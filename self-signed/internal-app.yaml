@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: internal-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: internal-app
+  template:
+    metadata:
+      labels:
+        app: internal-app
+    spec:
+      containers:
+      - name: internal-app
+        image: mcr.microsoft.com/azuredocs/aks-helloworld:v1
+        ports:
+        - containerPort: 80
+        env:
+        - name: TITLE
+          value: "Welcome to your internal App, secured with Self-Signed Certificate"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: internal-app
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: internal-app

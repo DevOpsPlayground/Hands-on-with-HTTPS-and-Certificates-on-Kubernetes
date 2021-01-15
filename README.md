@@ -26,55 +26,6 @@ Clone down this repoistory
     git clone <this_repo>
     cd <repo_name>
 
-## Self-Signed Certificates 
-
-Add the ingress-nginx repository
-    
-    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-
-Use Helm to deploy an NGINX ingress controller
-    
-    helm install nginx-ingress ingress-nginx/ingress-nginx \
-        --set controller.replicaCount=2 \
-        --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
-        --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
-
-Generate TLS certificates using openssl self-signed (or alternatively use Vault as CA, see `vault-ca` dir).
-
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-        -out /tmp/tls.crt \
-        -keyout /tmp/tls.key \
-        -subj "/CN=dpg.com"
-
-Create Kubernetes secret for the TLS certificate
-
-    kubectl create secret tls tls-secret \
-        --key /tmp/tls.key \
-        --cert /tmp/tls.crt
-
-Run the two demo applications using `kubectl apply`
-
-    kubectl apply -f self-signed/self-signed-app.yaml
-
-Create the ingress resource (remember to modify the host to be the CN, Common Name, you have configured)
-
-    kubectl apply -f self-signed/self-signed-app.yaml
-
-Test the ingress configuration (self-signed)
-
-    curl -v -k --resolve example.com:443:$(kubectl get services nginx-ingress-ingress-nginx-controller | awk 'NR==2 {print $4}') https://example.com # Trusts any certificates
-
-    curl -v --cacert tls.crt --resolve example.com:443:$(kubectl get services nginx-ingress-ingress-nginx-controller | awk 'NR==2 {print $4}') https://example.com # Trusts on certificate specified in command
-
-Alternatively on your own machie (not workstation) modify hosts file and view in browser.
-
-
-## Automated Certificates signed by LetsEncypt
-
-Login to Azure using service principal 
-
-    az login --service-principal -u $APP_ID -p $APP_PW --tenant $TENANT_ID
-
 ### Deploy an HTTPS Ingress Controller using Helm
 For the built in Ingress resource to work, the cluster must have an Ingress Controller running. 
 
@@ -99,11 +50,51 @@ Once this is deployed, we can view the created service and assocaited EXTERNAL_I
 
     kubectl get services ingress-nginx-controller
 
-The EXTERNAL_IP of this service acts as an entry point from the outside world. Ingress rules we can route requests to services within the cluster.
+The EXTERNAL_IP of this service acts as an entry point from the outside world. Ingress rules we can route requests to services within the cluster.    
+
+## Self-Signed Certificates 
+
+Generate TLS certificates using openssl self-signed (or alternatively use Vault as CA, see `vault-ca` dir).
+
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -out /tmp/tls.crt \
+        -keyout /tmp/tls.key \
+        -subj "/CN=dpg.com"
+
+Create Kubernetes secret for the TLS certificate
+
+    kubectl create secret tls internal-tls-secret \
+        --key /tmp/tls.key \
+        --cert /tmp/tls.crt
+
+Run the demo application using `kubectl apply`
+
+    kubectl apply -f self-signed/internal-app.yaml
+
+Create the ingress resource (remember to modify the host to be the CN, Common Name, you have configured)
+
+    kubectl apply -f self-signed/internal-ingress.yaml
+
+Test the ingress configuration (self-signed)
+
+    curl -v -k --resolve dpg.com:443:$(kubectl get services ingress-nginx-controller | awk 'NR==2 {print $4}') https://dpg.com # Trusts any certificates
+
+    curl -v --cacert /tmp/tls.crt --resolve dpg.com:443:$(kubectl get services ingress-nginx-controller | awk 'NR==2 {print $4}') https://dpg.com # Trusts on certificate specified in command
+
+Alternatively on your own machine (not workstation) modify hosts file and view in browser. 
+
+(Note: If the browser prevents you from proceeding type "thisisunsafe" into the browser window. This should bypass the browsers built in security checks.)
+
+
+## Automated Certificates signed by LetsEncypt
+
+Login to Azure using service principal 
+
+    az login --service-principal -u $APP_ID -p $APP_PW --tenant $TENANT_ID
 
 ### Configure a FQDN for the Ingress Controller EXTERNAL_IP
 
-During the installation, an Azure public IP address is created for the Ingress Controller which we can associate with a Fully Qualified Domain Name.
+During the installation of the Ingress Controller, an Azure Public IP address is created that corresponds with Ingress Controller service in Kubernetes. We can associate the Azure Public IP with a Fully Qualified Domain Name.
 
     # Public IP address of your Ingress Controller
     IP=$(kubectl get services ingress-nginx-controller | awk 'NR==2 {print $4}')

@@ -1,33 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: self-signed-app
+  name: prod-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: self-signed-app
+      app: prod-app
   template:
     metadata:
       labels:
-        app: self-signed-app
+        app: prod-app
     spec:
       containers:
-      - name: aks-helloworld
+      - name: prod-app
         image: mcr.microsoft.com/azuredocs/aks-helloworld:v1
         ports:
         - containerPort: 80
         env:
         - name: TITLE
-          value: "Welcome to your app secured with self-signed keys"
+          value: "Welcome to your Production App, certificates signed by LetEncypt"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: self-signed-app
+  name: prod-app
 spec:
   type: ClusterIP
   ports:
   - port: 80
   selector:
-    app: self-signed-app
+    app: prod-app
