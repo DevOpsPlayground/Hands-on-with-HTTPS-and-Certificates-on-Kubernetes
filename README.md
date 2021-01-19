@@ -141,9 +141,12 @@ Create Issuer
 
     kubectl apply -f LetsEncrypt/issuer.yaml
 
-Create an Ingress route 
+Update Ingress manifest to use our FQDN
 
     sed -i "s/<REPLACE_ME>/$FQDN/g" LetsEncrypt/prod-ingress.yaml
+
+Create an Ingress route by applying manifest 
+
     kubectl apply -f LetsEncrypt/prod-ingress.yaml 
 
 Verify that the certificate was created successfully by checking READY is True, which may take a minute
