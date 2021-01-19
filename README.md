@@ -45,8 +45,8 @@ Use Helm to deploy an NGINX Ingress Controller
     
     helm install ingress-nginx ingress-nginx/ingress-nginx \
         --set controller.scope.enabled=true \
-        --set controller.admissionWebhooks.enabled=false \
-        --set rbac.scope=true
+        --set rbac.scope=true \
+        --set controller.admissionWebhooks.enabled=false 
 
 Once this is deployed, we can view the created service and assocaited EXTERNAL_IP (Note: may take a minute to generate the IP)
 

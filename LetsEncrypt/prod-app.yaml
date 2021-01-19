@@ -19,7 +19,7 @@ spec:
         - containerPort: 80
         env:
         - name: TITLE
-          value: "Welcome to your Production App! Certificates signed by LetEncypt"
+          value: "Welcome to your Production App! Certificates signed by LetsEncypt"
 ---
 apiVersion: v1
 kind: Service
