@@ -89,8 +89,11 @@ Test the ingress configuration (self-signed)
 
 Alternatively on your own machine (not your workstation) modify hosts file and view in browser. (Note: this will require sudo access)
 
-`Windows c:\windows\system32\drivers\etc\hosts`
-`Mac     /etc/hosts`
+Host file locations:
+
+`Windows        c:\windows\system32\drivers\etc\hosts`
+
+`Mac & Linux    /etc/hosts`
  
 
 (Note: If the browser prevents you from proceeding type "thisisunsafe" into the browser window. This should bypass the browsers built in security checks.)
