@@ -19,7 +19,7 @@ spec:
         - containerPort: 80
         env:
         - name: TITLE
-          value: "Welcome to your internal App, secured with Self-Signed Certificate"
+          value: "Welcome to your Internal App! Secured with Self-Signed Certificates"
 ---
 apiVersion: v1
 kind: Service
