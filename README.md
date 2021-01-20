@@ -89,7 +89,7 @@ Test the ingress configuration (self-signed)
 
 Alternatively on your own machine (not your workstation) modify hosts file and view in browser. (Note: this will require sudo access)
 
-Host file locations:
+Hosts file locations:
 
 `Windows        c:\windows\system32\drivers\etc\hosts`
 
