@@ -48,7 +48,7 @@ Use Helm to deploy an NGINX Ingress Controller
         --set rbac.scope=true \
         --set controller.admissionWebhooks.enabled=false 
 
-Once this is deployed, we can view the created service and assocaited EXTERNAL_IP (Note: may take a minute to generate the IP)
+Once this is deployed, we can view the created service and assocaited EXTERNAL_IP (Note: may take a few seconds to generate the IP)
 
     kubectl get services ingress-nginx-controller
 
@@ -56,11 +56,11 @@ Set the EXTERNAL_IP as a variable for later use
 
     EXTERNAL_IP=$(kubectl get services ingress-nginx-controller | awk 'NR==2 {print $4}')
 
-The EXTERNAL_IP of this service acts as an entry point from the outside world.<!--  Using Ingress rules we can route requests to services within the cluster.     -->
+The EXTERNAL_IP of this service acts as an entry point from the outside world.
 
 ## Self-Signed Certificates 
 
-Generate TLS certificates using openssl self-signed (or alternatively use Vault as CA, see `vault-ca` dir).
+Generate self-signed TLS certificate using openssl 
 
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
         -out /tmp/tls.crt \
@@ -77,11 +77,11 @@ Run the demo application using `kubectl apply`
 
     kubectl apply -f self-signed/internal-app.yaml
 
-Create the ingress resource (remember to modify the host to be the CN, Common Name, you have configured)
+Create the Ingress resource
 
     kubectl apply -f self-signed/internal-ingress.yaml
 
-Test the ingress configuration (self-signed)
+Test the Ingress configuration
 
     curl -v -k --resolve dpg.com:443:$EXTERNAL_IP https://dpg.com # Trusts any certificates
 
@@ -107,7 +107,7 @@ Login to Azure using service principal
 
 ### Configure a FQDN for the Ingress Controller EXTERNAL_IP
 
-During the installation of the Ingress Controller, an Azure Public IP address is created that corresponds with Ingress Controller service in Kubernetes. We can associate the Azure Public IP with a Fully Qualified Domain Name.
+Because our Kubernetes cluster is hosted on Azure AKS, during the installation of the Ingress Controller an Azure Public IP address is created that corresponds with the service EXTERNAL_IP. We can associate this Azure Public IP with a Fully Qualified Domain Name.
 
     # Public IP address of your Ingress Controller
     EXTERNAL_IP=$(kubectl get services ingress-nginx-controller | awk 'NR==2 {print $4}')
@@ -127,6 +127,8 @@ During the installation of the Ingress Controller, an Azure Public IP address is
     # Set FQDN as variable
     FQDN=$(az network public-ip show --ids $PUBLICIPID --query "[dnsSettings.fqdn]" --output tsv)
 
+We now have a unquie FQDN that we can use for our application.
+
 ### Deploy demo application to Kubernetes cluster
 Deploy the demo application using `kubectl apply`
 
@@ -135,7 +137,7 @@ Deploy the demo application using `kubectl apply`
 ### Issue Certificates and configure Ingress
 Prior to this interactive session, the kubernetes **cert-manager** controller has been pre-installed onto the Kubernetes cluster. See `aks-cluster` directory for details.
 
-Cert-manager is a Kubernetes add-on to automate the management and issuance of TLS certificates from various issuing sources, including external CAs.
+Cert-manager is a Kubernetes add-on that automates the management and issuance of TLS certificates from various issuing sources, including external CAs.
 
 Create Issuer
 
