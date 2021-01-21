@@ -5,8 +5,8 @@ kind: Issuer
 metadata:
   name: letsencrypt
 spec:
-# Automated Certificate Management Environment (ACME) Certificate Authority server
-# Certificates issued by public ACME servers are typically trusted by client’s browsers by default
+# The Automatic Certificate Management Environment (ACME) protocol automates certificate provisioning
+# ACME is the underlying protocol of LetsEncypt CA
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
     # Temporary email generated via Temp Mail

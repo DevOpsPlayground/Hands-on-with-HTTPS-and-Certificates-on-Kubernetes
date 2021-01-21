@@ -71,7 +71,7 @@ curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt-get update && sudo apt-get install yarn
 echo "--> Installing Wetty web terminal"
-sudo yarn global add wetty
+sudo yarn global add wetty@v2.0.2
 echo "--> Configuring Nginx proxy for Wetty web terminal"
 sudo tee /etc/nginx/nginx.conf > /dev/null <<"EOF"
 user www-data;
