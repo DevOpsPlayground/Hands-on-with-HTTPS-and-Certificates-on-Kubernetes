@@ -61,6 +61,8 @@ contexts:
 # Define current context
 current-context: ${namespace}
 EOF
+chown ${linux_user}:${linux_user} /home/${linux_user}/.kube/config
+chmod 600 /home/${linux_user}/.kube/config
 
 # Install web terminal - WeTTY
 echo "--> Installing nodejs and nginx"
