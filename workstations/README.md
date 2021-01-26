@@ -1,4 +1,4 @@
-# Provision atendee workstations and 
+# Provision attendee workstations and 
 
 ## Prerequisites
 Must have built aks-cluster and resource group from other directory.
