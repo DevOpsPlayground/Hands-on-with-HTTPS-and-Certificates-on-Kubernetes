@@ -29,15 +29,11 @@ Ingress exposes HTTP and HTTPS routes from outside the cluster to services withi
 
 ![alt text](assets/simple_ingress_k8s.png "Simple Ingress Example Kubernetes")
 
-For the built in Ingress resource to work, the cluster must have an **Ingress Controller** running. 
+For the built in Ingress resource to work, the cluster must have an **Ingress Controller** running. The Ingress Controller watches for new Ingress rules, that we may define in Kubernetes manifests, and fulfills the mapping from Domain Names outside of the cluster to services running within the cluster.
 
-We can declaratively define Ingress resources using Kubernetes manifests, however it is the Ingress Controller that determines how this will be fulfilled. The Ingress Controller watches for new Ingress rules and fulfills the mapping from services within the cluster to public URLs/domain names outside the cluster.
+Unlike other types of controllers which run as part of the kube-controller-manager binary, Ingress controllers are not started automatically with a cluster. The most popular controller is provided by NGINX, we can add this to our cluster using **Helm**.
 
-Unlike other types of controllers which run as part of the kube-controller-manager binary, Ingress Controllers are not started automatically with a cluster. The most popular controller is provided by NGINX, we can add this to our cluster using **Helm**.
-
-Helm is a package manager purpose built for Kubernetes. Helm has been pre-installed on your workstations.
-
-Add the ingress-nginx repository
+Add the ingress-nginx Helm chart repository
     
     helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
@@ -48,7 +44,7 @@ Use Helm to deploy an NGINX Ingress Controller
         --set rbac.scope=true \
         --set controller.admissionWebhooks.enabled=false 
 
-Once this is deployed, we can view the created service and assocaited EXTERNAL_IP (Note: may take a few seconds to generate the IP)
+Once this is deployed, we can view the created service and assocaited EXTERNAL_IP (Note: It may take a few seconds to generate the IP)
 
     kubectl get services ingress-nginx-controller
 
@@ -56,7 +52,7 @@ Set the EXTERNAL_IP as a variable for later use
 
     EXTERNAL_IP=$(kubectl get services ingress-nginx-controller | awk 'NR==2 {print $4}')
 
-The EXTERNAL_IP of this service acts as an entry point from the outside world.
+The EXTERNAL_IP of this service acts as an entry point for the outside world.
 
 ## Self-Signed Certificates 
 
@@ -83,9 +79,9 @@ Create the Ingress resource
 
 Test the Ingress configuration
 
-    curl -v -k --resolve dpg.com:443:$EXTERNAL_IP https://dpg.com # Trusts any certificates
+    curl -v --cacert /tmp/tls.crt --resolve dpg.com:443:$EXTERNAL_IP https://dpg.com 
 
-    curl -v --cacert /tmp/tls.crt --resolve dpg.com:443:$EXTERNAL_IP https://dpg.com # Trusts on certificate specified in command
+In the above curl command we indicate that we trust the self-signed certificate. `/tmp/tls.crt` contains the public key needed to verify the certificate was signed by us.
 
 Alternatively on your own machine (not your workstation) modify hosts file and view in browser. (Note: this will require sudo access)
 
@@ -96,7 +92,7 @@ Hosts file locations:
 `Mac & Linux    /etc/hosts`
  
 
-(Note: If the browser prevents you from proceeding type "thisisunsafe" into the browser window. This should bypass the browsers built in security checks.)
+(Note: If the browser prevents you from proceeding, type "thisisunsafe" into the browser window. This should bypass the browsers built in security checks)
 
 
 ## Automated Certificates signed by LetsEncypt
@@ -135,7 +131,7 @@ Deploy the demo application using `kubectl apply`
     kubectl apply -f LetsEncrypt/prod-app.yaml
 
 ### Issue Certificates and configure Ingress
-Prior to this interactive session, the kubernetes **cert-manager** controller has been pre-installed onto the Kubernetes cluster. See `aks-cluster` directory for details.
+Prior to this interactive session, the Kubernetes **cert-manager** controller has been pre-installed onto the Kubernetes cluster. See `aks-cluster` directory for details.
 
 Cert-manager is a Kubernetes add-on that automates the management and issuance of TLS certificates from various issuing sources, including external CAs.
 
@@ -155,7 +151,7 @@ Verify that the certificate was created successfully by checking READY is True, 
 
     kubectl get certificate
 
-### View HTTPS applicaiton in browser
+### View HTTPS application in browser
 Finally navigate to the the Fully Qualified Domain Name, copy the result of the echo command to your browser
 
     echo $FQDN 
