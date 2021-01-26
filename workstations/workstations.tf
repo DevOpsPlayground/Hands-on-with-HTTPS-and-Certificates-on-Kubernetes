@@ -56,7 +56,12 @@ resource "kubernetes_role" "role" {
   }
   rule {
     api_groups = ["cert-manager.io"]
-    resources  = ["issuers", "certificates", "certificaterequests", "orders", "challenges"]
+    resources  = ["issuers", "certificates", "certificaterequests"]
+    verbs      = ["*"]
+  }
+  rule {
+    api_groups = ["acme.cert-manager.io"]
+    resources  = ["orders", "challenges"]
     verbs      = ["*"]
   }
   rule {
