@@ -29,9 +29,9 @@ Ingress exposes HTTP and HTTPS routes from outside the cluster to services withi
 
 ![alt text](assets/simple_ingress_k8s.png "Simple Ingress Example Kubernetes")
 
-For the built in Ingress resource to work, the cluster must have an **Ingress Controller** running. The Ingress Controller watches for new Ingress rules, that we may define in Kubernetes manifests, and fulfills the mapping from Domain Names outside of the cluster to services running within the cluster.
+For the built in Ingress resource to work, the cluster must have an **Ingress Controller** running. The Ingress Controller watches for new Ingress rules, that we may define in Kubernetes manifests, and fulfills the mapping <!-- from Domain Names outside of the cluster to services running within the cluster. -->
 
-Unlike other types of controllers which run as part of the kube-controller-manager binary, Ingress controllers are not started automatically with a cluster. The most popular controller is provided by NGINX, we can add this to our cluster using **Helm**.
+Ingress controllers are not started automatically with a cluster. The most popular controller is provided by NGINX, we can add this to our cluster using **Helm**.
 
 Add the ingress-nginx Helm chart repository
     
@@ -54,14 +54,14 @@ Set the EXTERNAL_IP as a variable for later use
 
 The EXTERNAL_IP of this service acts as an entry point for the outside world.
 
-## Self-Signed Certificates 
+## Internal App - Self-Signed Certificates 
 
 Generate self-signed TLS certificate using openssl 
 
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
         -out /tmp/tls.crt \
         -keyout /tmp/tls.key \
-        -subj "/CN=dpg.com"
+        -subj "/CN=example.dpg"
 
 Create Kubernetes secret for the TLS certificate
 
@@ -79,11 +79,11 @@ Create the Ingress resource
 
 Test the Ingress configuration
 
-    curl -v --cacert /tmp/tls.crt --resolve dpg.com:443:$EXTERNAL_IP https://dpg.com 
+    curl -v --cacert /tmp/tls.crt --resolve example.dpg:443:$EXTERNAL_IP https://example.dpg 
 
 In the above curl command we indicate that we trust the self-signed certificate as an internal "CA". 
 
-`/tmp/tls.crt` contains the public key needed to verify the certificate for `dpg.com` was signed by the private key `/tmp/tls.key`.
+`/tmp/tls.crt` contains the public key needed to verify the certificate for `example.dpg` was signed by the private key `/tmp/tls.key`.
 
 
 Alternatively on your own machine (not your workstation) modify hosts file and view in browser. This will require sudo access.
@@ -98,13 +98,13 @@ Hosts file locations:
 (Note: If the browser prevents you from proceeding, type "thisisunsafe" into the browser window. This should bypass the browsers built in security checks)
 
 
-## Automated Certificates signed by LetsEncypt
+## Prod App - Automated Certificates signed by LetsEncypt
 
 Login to Azure using service principal 
 
     az login --service-principal -u $APP_ID -p $APP_PW --tenant $TENANT_ID
 
-### Configure a FQDN for the Ingress Controller EXTERNAL_IP
+### Configure FQDN for the Ingress Controller EXTERNAL_IP
 
 Because our Kubernetes cluster is hosted on Azure AKS, during the installation of the Ingress Controller an Azure Public IP address is created that corresponds with the service EXTERNAL_IP. We can associate this Azure Public IP with a Fully Qualified Domain Name.
 
@@ -154,7 +154,14 @@ Verify that the certificate was created successfully by checking READY is True, 
 
     kubectl get certificate
 
+Desribe the certificate resouce to reveal what happens behind the scenes
+
+    Kubectl describe certificate tls-secret
+
 ### View HTTPS application in browser
 Finally navigate to the the Fully Qualified Domain Name, copy the result of the echo command to your browser
 
     echo $FQDN 
+
+## Summary
+We have now seen how we can deploy HTTPS applicaitons on Kubernetes. We secured the applications for internal environments using our own self-sign certificates; and for production we automated the issuance of certificates, signed by a trusted CA (LetsEncrypt) using the Kubernetes **cert-manager** addon.
