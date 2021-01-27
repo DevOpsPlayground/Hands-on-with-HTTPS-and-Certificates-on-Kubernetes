@@ -164,4 +164,4 @@ Finally navigate to the the Fully Qualified Domain Name, copy the result of the 
     echo $FQDN 
 
 ## Summary
-We have now seen how we can deploy HTTPS applicaitons on Kubernetes. We secured the applications for internal environments using our own self-sign certificates; and for production we automated the issuance of certificates, signed by a trusted CA (LetsEncrypt) using the Kubernetes **cert-manager** addon.
+We have now seen how we can deploy HTTPS applicaitons on Kubernetes. We secured our internal applications using our own self-sign certificates; and for production we automated the issuance of certificates, signed by a trusted CA (LetsEncrypt), using the Kubernetes **cert-manager** addon.

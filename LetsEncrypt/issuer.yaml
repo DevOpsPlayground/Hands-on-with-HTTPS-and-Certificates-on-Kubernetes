@@ -1,6 +1,6 @@
 apiVersion: cert-manager.io/v1alpha2
 # An Issuer is a custom resource definition (CRD) made available through the cert-manager controller
-# Issuers represent CAs and allow us to automate the generation of signed certificates
+# Issuers represent CAs and allow us to automate the generation of certificates
 kind: Issuer
 metadata:
   name: letsencrypt
