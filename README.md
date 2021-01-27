@@ -66,8 +66,8 @@ Generate self-signed TLS certificate using openssl
 Create Kubernetes secret for the TLS certificate
 
     kubectl create secret tls internal-tls-secret \
-        --key /tmp/tls.key \
-        --cert /tmp/tls.crt
+        --cert /tmp/tls.crt \
+        --key /tmp/tls.key
 
 Run the demo application using `kubectl apply`
 
