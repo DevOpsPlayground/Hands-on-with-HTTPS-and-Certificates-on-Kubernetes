@@ -86,7 +86,7 @@ In the above curl command we indicate that we trust the self-signed certificate 
 `/tmp/tls.crt` contains the public key needed to verify the certificate for `dpg.com` was signed by the private key `/tmp/tls.key`.
 
 
-Alternatively on your own machine (not your workstation) modify hosts file and view in browser. (Note: this will require sudo access)
+Alternatively on your own machine (not your workstation) modify hosts file and view in browser. This will require sudo access.
 
 Hosts file locations:
 
