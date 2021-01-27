@@ -9,10 +9,10 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - dpg.com
+    - dpgexample.com
     secretName: internal-tls-secret
   rules:
-  - host: dpg.com
+  - host: dpgexample.com
     http:
       paths:
       - backend:

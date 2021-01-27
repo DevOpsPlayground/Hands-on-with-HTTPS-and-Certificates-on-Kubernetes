@@ -29,7 +29,7 @@ Ingress exposes HTTP and HTTPS routes from outside the cluster to services withi
 
 ![alt text](assets/simple_ingress_k8s.png "Simple Ingress Example Kubernetes")
 
-For the built in Ingress resource to work, the cluster must have an **Ingress Controller** running. The Ingress Controller watches for new Ingress rules, that we may define in Kubernetes manifests, and fulfills the mapping <!-- from Domain Names outside of the cluster to services running within the cluster. -->
+For the built in Ingress resource to work, the cluster must have an **Ingress Controller** running. The Ingress Controller fulfills the mapping of Ingress rules, that we define in Kubernetes manifests for example.
 
 Ingress controllers are not started automatically with a cluster. The most popular controller is provided by NGINX, we can add this to our cluster using **Helm**.
 
@@ -61,7 +61,7 @@ Generate self-signed TLS certificate using openssl
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
         -out /tmp/tls.crt \
         -keyout /tmp/tls.key \
-        -subj "/CN=example.dpg"
+        -subj "/CN=dpgexample.com"
 
 Create Kubernetes secret for the TLS certificate
 
@@ -79,11 +79,11 @@ Create the Ingress resource
 
 Test the Ingress configuration
 
-    curl -v --cacert /tmp/tls.crt --resolve example.dpg:443:$EXTERNAL_IP https://example.dpg 
+    curl -v --cacert /tmp/tls.crt --resolve dpgexample.com:443:$EXTERNAL_IP https://dpgexample.com 
 
 In the above curl command we indicate that we trust the self-signed certificate as an internal "CA". 
 
-`/tmp/tls.crt` contains the public key needed to verify the certificate for `example.dpg` was signed by the private key `/tmp/tls.key`.
+`/tmp/tls.crt` contains the public key needed to verify the certificate for `dpgexample.com` was signed by the private key `/tmp/tls.key`.
 
 
 Alternatively on your own machine (not your workstation) modify hosts file and view in browser. This will require sudo access.
@@ -156,7 +156,7 @@ Verify that the certificate was created successfully by checking READY is True, 
 
 Desribe the certificate resouce to reveal what happens behind the scenes
 
-    Kubectl describe certificate tls-secret
+    kubectl describe certificate tls-secret
 
 ### View HTTPS application in browser
 Finally navigate to the the Fully Qualified Domain Name, copy the result of the echo command to your browser
