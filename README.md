@@ -29,9 +29,9 @@ Ingress exposes HTTP and HTTPS routes from outside the cluster to services withi
 
 ![alt text](assets/simple_ingress_k8s.png "Simple Ingress Example Kubernetes")
 
-For the built in Ingress resource to work, the cluster must have an **Ingress Controller** running. The Ingress Controller fulfills the mapping of Ingress rules, that we define in Kubernetes manifests for example.
+For the built in Ingress resource to work, the cluster must have an **Ingress Controller** running. The Ingress Controller fulfills the mapping of Ingress rules we define.
 
-Ingress controllers are not started automatically with a cluster. The most popular controller is provided by NGINX, we can add this to our cluster using **Helm**.
+Ingress controllers are not included by default within a cluster. The most popular controller is provided by NGINX, we can add this to our cluster using **Helm**.
 
 Add the ingress-nginx Helm chart repository
     
@@ -83,7 +83,7 @@ Test the Ingress configuration
 
 In the above curl command we indicate that we trust the self-signed certificate as an internal "CA". 
 
-`/tmp/tls.crt` contains the public key needed to verify the certificate for `dpgexample.com` was signed by the private key `/tmp/tls.key`.
+<!-- `/tmp/tls.crt` contains the public key needed to verify the certificate for `dpgexample.com` was signed by the private key `/tmp/tls.key`. -->
 
 
 Alternatively on your own machine (not your workstation) modify hosts file and view in browser. This will require sudo access.
@@ -154,7 +154,7 @@ Verify that the certificate was created successfully by checking READY is True, 
 
     kubectl get certificate
 
-Desribe the certificate resouce to reveal what happens behind the scenes
+Desribe the certificate resource to reveal what happens behind the scenes
 
     kubectl describe certificate tls-secret
 
