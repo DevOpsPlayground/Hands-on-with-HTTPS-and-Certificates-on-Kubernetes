@@ -1,7 +1,7 @@
 apiVersion: cert-manager.io/v1alpha2
 # An Issuer is a custom resource definition (CRD) made available through the cert-manager controller
 # Issuers represent CAs and allow us to automate the generation of certificates
-kind: Issuer
+kind: ClusterIssuer
 metadata:
   name: letsencrypt
 spec:
@@ -10,7 +10,7 @@ spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
     # Temporary email generated via Temp Mail
-    email: nafifi3179@j24blog.com
+    email: malikf951@gmail.com
     privateKeySecretRef:
       name: letsencrypt
     solvers:
